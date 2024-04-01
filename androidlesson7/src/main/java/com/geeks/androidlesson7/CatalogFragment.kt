@@ -6,12 +6,17 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.setFragmentResultListener
 import com.geeks.androidlesson7.databinding.FragmentCatalogBinding
 
-class CatalogFragment : Fragment() {
+class CatalogFragment : Fragment(), OnItemClickListener {
 
     private var _binding: FragmentCatalogBinding? = null
     private val binding get() = _binding!!
+    private val catalogAdapter = CatalogAdapter(
+        catalogList = CatalogData.catalogList,
+        onItemClickListener = this
+    )
 
     /**
      * Фрагмент привязывается к Activity и получает Context
@@ -45,24 +50,30 @@ class CatalogFragment : Fragment() {
      */
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        navigateToDetails()
+        initialize()
+        navigateToAddProduct()
+        acceptProduct()
     }
 
-    private fun navigateToDetails() = with(binding) {
-        btnToDetails.setOnClickListener {
-            val text = etInput.text.toString().trim()
-            if (text.isEmpty()) {
-                etInput.error = getString(R.string.fill_field)
-            } else {
-                val bundle = Bundle()
-                bundle.putString(TEXT_KEY, text)
-                val detailsFragment = DetailsFragment().apply {
-                    arguments = bundle
+    private fun initialize() {
+        binding.rvCatalog.adapter = catalogAdapter
+    }
+
+    private fun navigateToAddProduct() {
+        binding.fabAddProduct.setOnClickListener {
+            parentFragmentManager.beginTransaction()
+                .add(R.id.fragment_container, AddProductFragment())
+                .addToBackStack(CATALOG_TAG)
+                .commit()
+        }
+    }
+
+    private fun acceptProduct() {
+        setFragmentResultListener(AddProductFragment.ADD_PRODUCT_REQUEST_KEY) { requestKey, bundle ->
+            if (requestKey == AddProductFragment.ADD_PRODUCT_REQUEST_KEY) {
+                bundle.getParcelable<Product>(PRODUCT_KEY)?.let { product ->
+                    catalogAdapter.addProduct(product)
                 }
-                parentFragmentManager.beginTransaction()
-                    .add(R.id.fragment_container, detailsFragment)
-                    .addToBackStack(CATALOG_TAG)
-                    .commit()
             }
         }
     }
@@ -95,6 +106,22 @@ class CatalogFragment : Fragment() {
         super.onStop()
     }
 
+    override fun onItemClick(product: Product) {
+        val detailsFragment = DetailsFragment().apply {
+            arguments = Bundle().apply {
+                putParcelable(PRODUCT_KEY, product)
+            }
+        }
+        parentFragmentManager.beginTransaction()
+            .add(R.id.fragment_container, detailsFragment)
+            .addToBackStack(CATALOG_TAG)
+            .commit()
+    }
+
+    override fun onLongClick(position: Int) {
+        catalogAdapter.removeProduct(position)
+    }
+
     /**
      * View уничтожаются
      */
@@ -120,6 +147,6 @@ class CatalogFragment : Fragment() {
 
     companion object {
         const val CATALOG_TAG = "Catalog"
-        const val TEXT_KEY = "text"
+        const val PRODUCT_KEY = "product"
     }
 }

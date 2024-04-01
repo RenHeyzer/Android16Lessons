@@ -26,9 +26,14 @@ class DetailsFragment : Fragment() {
         goBack()
     }
 
-    private fun acceptArguments() {
-        arguments?.getString(CatalogFragment.TEXT_KEY)?.let { text ->
-            binding.tvTitle.text = text
+    private fun acceptArguments() = with(binding) {
+        arguments?.let {
+            it.getParcelable<Product>(CatalogFragment.PRODUCT_KEY)?.let { product ->
+                ivProductCover.setImageResource(product.coverImage)
+                tvProductPrice.text = product.price.toString()
+                tvProductFirm.text = product.firm
+                tvProductBody.text = product.body
+            }
         }
     }
 

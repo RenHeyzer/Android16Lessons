@@ -6,4 +6,12 @@
     <string name="details_title">Details</string>
     <string name="fill_field">Заполните поле!</string>
     <string name="icon_back_content_description">Кнопка назад</string>
+    <string name="product_cover_content_description">Обложка продукта</string>
+    <string name="catalog">Каталог</string>
+    <string name="input_product_price">Укажите цену товара</string>
+    <string name="input_product_firm">Укажите фирму</string>
+    <string name="input_product_body">Укажите, что это за товар</string>
+    <string name="add_product">Добавить товар</string>
+    <string name="fab_add_product_content_description">Кнопка для перехода на экран добавления нового товара</string>
+    <string name="fill_field_erorr_message">Заполните поле!</string>
 </resources>
